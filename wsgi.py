@@ -47,6 +47,8 @@ if len(wsgi_fqn_parts) == 2:
 wsgi_module = importlib.import_module(wsgi_fqn_parts[-1])
 wsgi_app = getattr(wsgi_module, wsgi_fqn[1])
 
+print(wsgi_fqn)
+print(wsgi_fqn_parts)
 
 def all_casings(input_string):
     """
@@ -78,6 +80,8 @@ def handler(event, context):
     else:
         script_name = ""
 
+    print(script_name)
+
     # If a user is using a custom domain on API Gateway, they may have a base
     # path in their URL. This allows us to strip it out via an optional
     # environment variable.
@@ -94,6 +98,8 @@ def handler(event, context):
         body = base64.b64decode(body)
     if isinstance(body, string_types):
         body = to_bytes(body, charset="utf-8")
+
+    print(script_name)
 
     environ = {
         "API_GATEWAY_AUTHORIZER": event[u"requestContext"].get(u"authorizer"),
@@ -123,6 +129,8 @@ def handler(event, context):
         "wsgi.version": (1, 0),
     }
 
+    
+
     for key, value in environ.items():
         if isinstance(value, string_types):
             environ[key] = wsgi_encoding_dance(value)
@@ -132,8 +140,9 @@ def handler(event, context):
         if key not in ("HTTP_CONTENT_TYPE", "HTTP_CONTENT_LENGTH"):
             environ[key] = value
 
+    print(environ)
     response = Response.from_app(wsgi_app, environ)
-
+    print(response)
     # If there are multiple Set-Cookie headers, create case-mutated variations
     # in order to pass them through APIGW. This is a hack that's currently
     # needed. See: https://github.com/logandk/serverless-wsgi/issues/11
